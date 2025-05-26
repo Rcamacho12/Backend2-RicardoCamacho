@@ -1,14 +1,9 @@
 <!-- src/views/login.handlebars -->
-<h2>Iniciar Sesión</h2>
+<h1>Iniciar Sesión</h1>
 <form action="/api/sessions/login" method="POST">
-    <div>
-        <label>Email:</label>
-        <input type="email" name="email" required />
-    </div>
-    <div>
-        <label>Contraseña:</label>
-        <input type="password" name="password" required />
-    </div>
-    <button type="submit">Entrar</button>
+  <input type="email" name="email" placeholder="Correo" required />
+  <input type="password" name="password" placeholder="Contraseña" required />
+  <button type="submit">Ingresar</button>
 </form>
-<p>¿No tenés cuenta? <a href="/register">Registrate</a></p>
+<a href="/reset-password">¿Olvidaste tu contraseña?</a>
+

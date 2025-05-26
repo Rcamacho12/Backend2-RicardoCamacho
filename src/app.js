@@ -1,34 +1,42 @@
 // src/app.js
-import express from "express";
-import { engine } from "express-handlebars";
-import path from "path";
-import dotenv from "dotenv";
-import connectDB from "./config/db.js";
-import passport from "./passport.js";
+import express from 'express';
+import handlebars from 'express-handlebars';
+import mongoose from 'mongoose';
+import passport from 'passport';
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
 
-import viewsRouter from "./routes/views.router.js";
-import sessionsRouter from "./routes/sessions.router.js";
+import { __dirname } from './utils.js';
+import { initPassport } from './middlewares/passport.js';
+
+import sessionsRouter from './routes/sessions.routes.js';
+import productsRouter from './routes/products.routes.js';
+import cartsRouter from './routes/carts.routes.js';
+import viewsRouter from './routes/views.routes.js';
 
 dotenv.config();
 const app = express();
-connectDB();
 
-// Handlebars
-app.engine("handlebars", engine({
-    defaultLayout: "main",
-    layoutsDir: path.join(process.cwd(), "src/views/layouts"),
-}));
-app.set("view engine", "handlebars");
-app.set("views", path.join(process.cwd(), "src/views"));
-
-// Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+app.engine('handlebars', handlebars.engine());
+app.set('view engine', 'handlebars');
+app.set('views', `${__dirname}/views`);
+
+initPassport();
 app.use(passport.initialize());
 
-// Rutas
-app.use("/", viewsRouter);
-app.use("/api/sessions", sessionsRouter);
+app.use('/', viewsRouter);
+app.use('/api/sessions', sessionsRouter);
+app.use('/api/products', productsRouter);
+app.use('/api/carts', cartsRouter);
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`🚀 Server en http://localhost:${PORT}`));
+mongoose.connect(process.env.MONGO_URL)
+  .then(() => {
+    app.listen(process.env.PORT, () =>
+      console.log(`Servidor funcionando en puerto ${process.env.PORT}`)
+    );
+  })
+  .catch(err => console.error('Error al conectar con MongoDB', err));
